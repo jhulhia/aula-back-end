@@ -1,33 +1,22 @@
 import express from 'express';
-import cookieParser from 'cookie-parser';
+import session from "express-session";
+//const session = require('express-session');
 
 const app = express();
-app.use(cookieParser());
-
-app.get('/set-cookie', (req, res) => {
-  res.cookie('usuario', 'Maria', { maxAge: 60000 });
-  res.send('Cookie definido!');
+app.use(session({
+  secret: 'segredo',
+  resave: false,
+  saveUninitialized: true,
+}));
+let cont = 0;
+app.get('/set-session', (req, res) => {
+    cont++;
+  req.session.usuario = 'Maria';
+  res.send('Sessão criada!');
 });
 
-app.get('/get-cookie', (req, res) => {
-  res.send(`Usuário: ${req.cookies.usuario}`);
-});
-
-app.get('/set-color', (req, res) => {
-  res.cookie('user', 'orange', { maxAge: 60000 });
-  res.send('cor definida!');
-});
-
-app.get('/get-color', (req, res) => {
-  const color = req.cookies.user || 'blue';
-
-  res.send(`
-    <html>
-      <body style="background-color: ${color};">
-        <h1>Cor carregada: ${color}</h1>
-      </body>
-    </html>
-  `);
+app.get('/get-session', (req, res) => {
+  res.send(`Usuário da sessão: ${req.session.usuario} ${cont}`);
 });
 
 app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
